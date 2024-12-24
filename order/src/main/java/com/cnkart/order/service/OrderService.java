@@ -3,7 +3,9 @@ package com.cnkart.order.service;
 
 import java.util.UUID;
 
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.cnkart.order.dto.OrderRequest;
 import com.cnkart.order.model.Order;
@@ -14,9 +16,12 @@ import com.cnkart.order.repository.OrderRepository;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    
+    private final RestTemplate restTemplate;
 
-    public OrderService(OrderRepository orderRepository) {
+    public OrderService(OrderRepository orderRepository, RestTemplateBuilder builder) {
         this.orderRepository = orderRepository;
+        this.restTemplate = builder.build();
     }
 
     public String placeOrder(OrderRequest orderRequest) {
@@ -26,9 +31,20 @@ public class OrderService {
         order.setQuantity(orderRequest.getQuantity());
         order.setSkuCode(orderRequest.getSkuCode());
 
-        orderRepository.save(order);
+        // Call Inventory Service, and place order if product is in stock
         
-        return "Order Placed";
+        String resourceUrl = "http://localhost:8083/api/inventory?skuCode={skuCode}&qty={qty}";
+        boolean isInStock
+                = Boolean.TRUE.equals(restTemplate.getForEntity(resourceUrl, Boolean.class,orderRequest.getSkuCode(),orderRequest.getQuantity()).getBody());
+
+        if(isInStock) {
+            orderRepository.save(order);
+            return "Order Placed";
+        }
+        else {
+            return "Item is not in stock, please try again later";
+            }
+
 
     }
 }
