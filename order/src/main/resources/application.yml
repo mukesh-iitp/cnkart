@@ -10,3 +10,19 @@ spring:
     name: order-service
 server:
   port: 8082
+  
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+hystrix:
+  dashboard:
+    proxy-stream-allow-list: "*"
