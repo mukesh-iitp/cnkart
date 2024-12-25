@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cnkart.order.dto.OrderRequest;
 import com.cnkart.order.service.OrderService;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +25,13 @@ public class OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @HystrixCommand(fallbackMethod = "fallbackPlaceOrder")
     public String placeOrder(@RequestBody OrderRequest orderRequest) {
         log.info("Placing Order");
         return orderService.placeOrder(orderRequest);
+    }
+    
+    public String fallbackPlaceOrder(@RequestBody OrderRequest orderRequest) {
+    	return "Service is not available";
     }
 }
