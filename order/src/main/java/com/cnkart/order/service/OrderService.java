@@ -19,9 +19,10 @@ public class OrderService {
     
     private final RestTemplate restTemplate;
 
-    public OrderService(OrderRepository orderRepository, RestTemplateBuilder builder) {
+    //public OrderService(OrderRepository orderRepository, RestTemplateBuilder builder) {
+    public OrderService(OrderRepository orderRepository, RestTemplate restTemplate) {
         this.orderRepository = orderRepository;
-        this.restTemplate = builder.build();
+        this.restTemplate = restTemplate;
     }
 
     public String placeOrder(OrderRequest orderRequest) {
@@ -33,7 +34,8 @@ public class OrderService {
 
         // Call Inventory Service, and place order if product is in stock
         
-        String resourceUrl = "http://localhost:8083/api/inventory?skuCode={skuCode}&qty={qty}";
+        //String resourceUrl = "http://localhost:8083/api/inventory?skuCode={skuCode}&qty={qty}";
+        String resourceUrl = "http://inventory-service/api/inventory?skuCode={skuCode}&qty={qty}";
         boolean isInStock
                 = Boolean.TRUE.equals(restTemplate.getForEntity(resourceUrl, Boolean.class,orderRequest.getSkuCode(),orderRequest.getQuantity()).getBody());
 
