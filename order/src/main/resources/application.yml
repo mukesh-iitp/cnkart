@@ -6,5 +6,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate.ddl-auto: update
+  application:
+    name: order-service
 server:
   port: 8082
